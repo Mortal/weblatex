@@ -27,9 +27,10 @@ class RenderView(View):
             pdf_filename = os.path.join(directory, 'document.pdf')
             with open(tex_filename, 'w') as fp:
                 fp.write(source)
-            with subprocess.Popen(['latexmk', '-pdf', 'document.tex'],
-                    cwd=directory, stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT) as pp:
+            with subprocess.Popen(['latexmk', '-pdf',
+                '-latexoption=-interaction nonstopmode', 'document.tex'],
+                cwd=directory, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT) as pp:
                 result = pp.stdout.read()
                 exitcode = pp.wait()
             if exitcode != 0:
