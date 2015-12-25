@@ -17,9 +17,11 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from weblatex.views import InputView, RenderView
+from weblatex.views import Booklet
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', InputView.as_view()),
     url(r'^render.pdf$', RenderView.as_view(), name='render_view'),
+    url(r'^booklet/$', Booklet.as_view()),
 ]
