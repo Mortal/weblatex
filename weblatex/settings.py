@@ -49,7 +49,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'driver.urls'
+ROOT_URLCONF = 'weblatex.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'driver.wsgi.application'
+WSGI_APPLICATION = 'weblatex.wsgi.application'
 
 
 # Database
