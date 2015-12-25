@@ -1,11 +1,16 @@
+from __future__ import division, absolute_import, unicode_literals
+
+import os.path
+import tempfile
+import subprocess
+
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse
-import tempfile
-import os.path
-import subprocess
+
 
 class InputView(TemplateView):
     template_name = 'weblatex/input.html'
+
 
 class RenderView(View):
     def post(self, request):
