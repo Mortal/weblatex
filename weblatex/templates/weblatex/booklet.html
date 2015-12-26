@@ -1,4 +1,12 @@
 <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Compile" />
+    {% for song in form.songs %}
+    <p>{{ song.order }} {{ song.song }} {{ song.twocolumn }}</p>
+    {% endfor %}
+    <input type="submit" value="Save" />
 </form>
+{% if object.pk %}
+<form method="post" action="{% url 'booklet_render' pk=object.pk %}">
+    {% csrf_token %}
+    <input type="submit" value="Render" />
+</form>
+{% endif %}

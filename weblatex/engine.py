@@ -24,6 +24,7 @@ def pdflatex(data):
     \documentclass[article,oneside,a4paper]{memoir}
     \usepackage[sc]{mathpazo}
     \usepackage[final]{microtype}
+    \usepackage{multicol}
     \usepackage[utf8]{inputenc}
     \begin{document}
     \tableofcontents*
