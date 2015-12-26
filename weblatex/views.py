@@ -1,14 +1,12 @@
 from __future__ import division, absolute_import, unicode_literals
 
-import os.path
-import tempfile
-import textwrap
-import subprocess
+from django.views.generic import TemplateView, View, FormView, CreateView, UpdateView
 
-from django.views.generic import TemplateView, View, FormView
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 
-from weblatex.forms import BookletForm
+from weblatex.forms import BookletForm, SongForm
+from weblatex.engine import render_pdf
+from weblatex.models import Song
 
 
 class Booklet(FormView):
@@ -17,67 +15,30 @@ class Booklet(FormView):
 
     def form_valid(self, form):
         data = '\n'.join(song.as_tex() for song in form.cleaned_data['songs'])
-        source = textwrap.dedent(r"""
-        \documentclass[article,oneside,a4paper]{memoir}
-        \usepackage[sc]{mathpazo}
-        \usepackage[final]{microtype}
-        \usepackage[utf8]{inputenc}
-        \begin{document}
-        \tableofcontents*
-        %s
-        \end{document}
-        """.strip()) % (data,)
-        return render_pdf(source)
+        return render_pdf(data)
 
 
 class InputView(TemplateView):
     template_name = 'weblatex/input.html'
 
 
-class TexException(Exception):
-    pass
-
-
-def pdflatex(source):
-    with tempfile.TemporaryDirectory() as directory:
-        tex_filename = os.path.join(directory, 'document.tex')
-        pdf_filename = os.path.join(directory, 'document.pdf')
-        with open(tex_filename, 'w') as fp:
-            fp.write(source)
-        with subprocess.Popen(['latexmk', '-pdf',
-            '-latexoption=-interaction nonstopmode', 'document.tex'],
-            cwd=directory, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT) as pp:
-            result = pp.stdout.read()
-            exitcode = pp.wait()
-        if exitcode != 0:
-            raise TexException(result)
-        with open(pdf_filename, 'rb') as fp:
-            return fp.read()
-
-
-def render_pdf(source):
-    try:
-        pdf_contents = pdflatex(source)
-        return HttpResponse(pdf_contents, content_type='application/pdf')
-    except TexException as e:
-        return HttpResponse(
-            e.args[0], content_type='text/plain', status=500)
-
-
 class RenderView(View):
     def post(self, request):
-        self.request = request
+        return render_pdf(self.request.POST['data'])
 
-        data = request.POST['data']
 
-        source = """
-        \\documentclass[article,oneside,a4paper]{memoir}
-        \\usepackage[sc]{mathpazo}
-        \\usepackage[final]{microtype}
-        \\begin{document}
-        %s
-        \\end{document}
-        """ % data
+class SongCreate(CreateView):
+    form_class = SongForm
+    template_name = 'weblatex/song_form.html'
 
-        return render_pdf(source)
+    def get_success_url(self):
+        return reverse('booklet')
+
+
+class SongUpdate(UpdateView):
+    form_class = SongForm
+    template_name = 'weblatex/song_form.html'
+    queryset = Song.objects
+
+    def get_success_url(self):
+        return reverse('booklet')

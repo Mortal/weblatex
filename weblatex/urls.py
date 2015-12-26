@@ -14,14 +14,17 @@ Including another URLconf
     2. Import the include() function: from django.conf.urls import url, include
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url, include
+from django.conf.urls import url
+# from django.conf.urls import include
 from django.contrib import admin
 from weblatex.views import InputView, RenderView
-from weblatex.views import Booklet
+from weblatex.views import Booklet, SongCreate, SongUpdate
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', InputView.as_view()),
     url(r'^render.pdf$', RenderView.as_view(), name='render_view'),
-    url(r'^booklet/$', Booklet.as_view()),
+    url(r'^booklet/$', Booklet.as_view(), name='booklet'),
+    url(r'^song/(?P<pk>\d+)/$', SongUpdate.as_view()),
+    url(r'^song/add/$', SongCreate.as_view()),
 ]

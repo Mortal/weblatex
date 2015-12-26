@@ -1,0 +1,15 @@
+<script>
+function remove_double_lines(s) {
+    return s.replace(/(\r*\n)\r*\n/g, '$1');
+}
+function fix_double_lines() {
+    var f = document.getElementById('song_form');
+    f.lyrics.value = remove_double_lines(f.lyrics.value);
+}
+</script>
+<form method="post" id="song_form">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" />
+<input type="button" onclick="fix_double_lines()" value="Fix double lines" />
+</form>
