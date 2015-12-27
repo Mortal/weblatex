@@ -26,6 +26,10 @@ def pdflatex(data):
     \usepackage[final]{microtype}
     \usepackage{multicol}
     \usepackage[utf8]{inputenc}
+    \usepackage{amsmath}
+    \catcode`<=\active
+    \def<#1>{${}^{\text{#1}}$}
+    \def\b{${}^\mathrm{b}$}
     \begin{document}
     \tableofcontents*
     \clearpage

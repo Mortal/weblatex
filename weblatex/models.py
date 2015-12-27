@@ -1,6 +1,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
 import re
+import itertools
 
 from django.db import models
 
@@ -36,15 +37,54 @@ class Booklet(models.Model):
         for e in self.bookletentry_set.all():
             position = PageField.parse_position(e.position)
             position = tuple((x1 or 1, x2 or 1) for x1, x2 in position)
-            songs.append((page, position, e))
+            position_flat = tuple(x for xs in position for x in xs)
+            songs.append((e.page, position_flat, e))
         songs.sort()
-        songs = []
-        for e in self.bookletentry_set.all():
-            song_tex = lyrics_as_tex(e.song.lyrics)
-            if e.twocolumn:
-                song_tex = r'\begin{multicols}{2}%s\end{multicols}' % song_tex
-            songs.append(r'\chapter{%s}%s\clearpage' % (e.song.name, song_tex))
-        return '\n'.join(songs)
+        pages = itertools.groupby(songs, key=lambda x: x[0])
+        output = []
+        for page, page_songs in pages:
+            page_songs = [
+                (position, entry) for page, position, entry in page_songs
+            ]
+            longest_position = max(
+                len(position) for position, entry in page_songs)
+            page_songs = [
+                (position + (1,) * (longest_position - len(position)),
+                 entry)
+                for position, entry in page_songs
+            ]
+            render_stack = [(0, page_songs)]
+            while render_stack:
+                disc, xs = render_stack.pop()
+                if isinstance(disc, str):
+                    output.append(disc)
+                elif len(xs) == 1:
+                    e = xs[0][1]
+                    song_tex = lyrics_as_tex(e.song.lyrics)
+                    if e.twocolumn:
+                        song_tex = (
+                            r'\begin{multicols}{2}' +
+                            r'%s\end{multicols}' % song_tex
+                        )
+                    output.append(r'\chapter{%s}%s' % (e.song.name, song_tex))
+                else:
+                    groups = itertools.groupby(xs, key=lambda x: x[0][disc])
+                    children = [(disc + 1, list(group)) for _, group in groups]
+                    if disc % 2 == 0:
+                        # Vertical
+                        for c in reversed(children):
+                            render_stack.append(c)
+                    else:
+                        # Horizontal
+                        for c in reversed(children):
+                            render_stack.append((r'\end{minipage}%', None))
+                            render_stack.append(c)
+                            render_stack.append(
+                                (r'\noindent\begin{minipage}[t]' +
+                                 r'{%s\textwidth}%%' % (1/len(children)),
+                                 None))
+            output.append(r'\clearpage')
+        return '\n'.join(output)
 
 
 class BookletEntry(models.Model):
