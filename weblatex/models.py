@@ -4,6 +4,8 @@ import re
 
 from django.db import models
 
+from weblatex.fields import PageField
+
 
 def lyrics_as_tex(lyrics):
     lyrics = re.sub(r'\r+\n?', '\n', lyrics)
@@ -30,6 +32,12 @@ class Booklet(models.Model):
     songs = models.ManyToManyField(Song, through='BookletEntry')
 
     def as_tex(self):
+        songs = []
+        for e in self.bookletentry_set.all():
+            position = PageField.parse_position(e.position)
+            position = tuple((x1 or 1, x2 or 1) for x1, x2 in position)
+            songs.append((page, position, e))
+        songs.sort()
         songs = []
         for e in self.bookletentry_set.all():
             song_tex = lyrics_as_tex(e.song.lyrics)
