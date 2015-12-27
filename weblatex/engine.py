@@ -40,13 +40,13 @@ def pdflatex(data):
         pp = subprocess.Popen(
             ['latexmk', '-pdf', '-latexoption=-interaction nonstopmode',
              'document.tex'],
-            cwd=directory, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT)
+            cwd=directory, universal_newlines=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         with pp:
             result = pp.stdout.read()
             exitcode = pp.wait()
         if exitcode != 0:
-            raise TexException(result.decode(errors='replace'))
+            raise TexException(result)
         with open(pdf_filename, 'rb') as fp:
             return fp.read()
 
