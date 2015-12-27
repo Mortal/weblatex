@@ -55,7 +55,7 @@ class BookletForm(forms.ModelForm):
         for s in Song.objects.all():
             pp = self.cleaned_data.get('page_%d' % s.pk)
             twocolumn = self.cleaned_data.get('twocolumn_%d' % s.pk)
-            if pp is not None:
+            if pp:
                 page, position = pp
                 position_str = PageField.position_to_str(position)
                 entries.append(
