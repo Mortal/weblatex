@@ -14,6 +14,17 @@ class PageField(forms.CharField):
                        for x1, x2 in coordinate)
 
     @staticmethod
+    def parse_position(s):
+        pattern = r'(v\d+)?(h\d+)?'
+        coordinate = []
+        if s:
+            for mo in re.finditer(pattern, s):
+                x1 = int(mo.group(1)[1:]) if mo.group(1) else None
+                x2 = int(mo.group(2)[1:]) if mo.group(2) else None
+                coordinate.append((x1, x2))
+        return tuple(coordinate)
+
+    @staticmethod
     def static_prepare_value(value):
         if isinstance(value, tuple):
             page, coordinate = value
@@ -42,10 +53,4 @@ class PageField(forms.CharField):
         if not re.match(p2, position):
             raise ValidationError(
                 'Sidetal skal være et heltal')
-        coordinate = []
-        if position:
-            for mo in re.finditer(pattern, position):
-                x1 = int(mo.group(1)[1:]) if mo.group(1) else None
-                x2 = int(mo.group(2)[1:]) if mo.group(2) else None
-                coordinate.append((x1, x2))
-        return (page, tuple(coordinate))
+        return (page, self.parse_position(position))
