@@ -15,13 +15,13 @@ class BookletCreate(CreateView):
     template_name = 'weblatex/booklet.html'
 
     def get_success_url(self):
-        return reverse('booklet_update', kwargs={'pk': self.object.pk})
+        return reverse('front')
 
 
 class BookletRender(DetailView):
     model = Booklet
 
-    def post(self, *args, **kwargs):
+    def get(self, *args, **kwargs):
         return render_pdf(self.get_object().as_tex())
 
 
@@ -31,16 +31,17 @@ class BookletUpdate(UpdateView):
     queryset = Booklet.objects
 
     def get_success_url(self):
-        return reverse('booklet_update', kwargs={'pk': self.object.pk})
+        return reverse('front')
 
 
-class InputView(TemplateView):
-    template_name = 'weblatex/input.html'
+class Front(TemplateView):
+    template_name = 'weblatex/front.html'
 
-
-class RenderView(View):
-    def post(self, request):
-        return render_pdf(self.request.POST['data'])
+    def get_context_data(self, **kwargs):
+        context_data = super(Front, self).get_context_data(**kwargs)
+        context_data['songs'] = Song.objects.all()
+        context_data['booklets'] = Booklet.objects.all()
+        return context_data
 
 
 class SongCreate(CreateView):
@@ -48,7 +49,7 @@ class SongCreate(CreateView):
     template_name = 'weblatex/song_form.html'
 
     def get_success_url(self):
-        return reverse('booklet')
+        return reverse('front')
 
 
 class SongUpdate(UpdateView):
@@ -57,4 +58,4 @@ class SongUpdate(UpdateView):
     queryset = Song.objects
 
     def get_success_url(self):
-        return reverse('booklet')
+        return reverse('front')

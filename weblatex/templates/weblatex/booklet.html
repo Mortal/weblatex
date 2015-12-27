@@ -4,9 +4,3 @@
     {% endfor %}
     <input type="submit" value="Save" />
 </form>
-{% if object.pk %}
-<form method="post" action="{% url 'booklet_render' pk=object.pk %}">
-    {% csrf_token %}
-    <input type="submit" value="Render" />
-</form>
-{% endif %}

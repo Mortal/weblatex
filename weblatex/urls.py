@@ -17,17 +17,19 @@ Including another URLconf
 from django.conf.urls import url
 # from django.conf.urls import include
 from django.contrib import admin
-from weblatex.views import InputView, RenderView
 from weblatex.views import (
-    BookletCreate, BookletUpdate, BookletRender, SongCreate, SongUpdate)
+    BookletCreate, BookletUpdate, BookletRender, SongCreate, SongUpdate,
+    Front,
+)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', InputView.as_view()),
-    url(r'^render.pdf$', RenderView.as_view(), name='render_view'),
-    url(r'^booklet/$', BookletCreate.as_view(), name='booklet'),
-    url(r'^booklet/(?P<pk>\d+)/$', BookletUpdate.as_view(), name='booklet_update'),
-    url(r'^booklet/(?P<pk>\d+)/render/$', BookletRender.as_view(), name='booklet_render'),
-    url(r'^song/(?P<pk>\d+)/$', SongUpdate.as_view()),
-    url(r'^song/add/$', SongCreate.as_view()),
+    url(r'^$', Front.as_view(), name='front'),
+    url(r'^booklet/$', BookletCreate.as_view(), name='booklet_create'),
+    url(r'^booklet/(?P<pk>\d+)/$', BookletUpdate.as_view(),
+        name='booklet_update'),
+    url(r'^booklet/(?P<pk>\d+)/render/$', BookletRender.as_view(),
+        name='booklet_render'),
+    url(r'^song/(?P<pk>\d+)/$', SongUpdate.as_view(), name='song_update'),
+    url(r'^song/add/$', SongCreate.as_view(), name='song_create'),
 ]

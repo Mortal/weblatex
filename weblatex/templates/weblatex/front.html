@@ -1,0 +1,21 @@
+{% extends "weblatex/base.html" %}
+{% block content %}
+<h1>WebLaTeX</h1>
+
+<h2>Songs</h2>
+<ul>
+<li><a href="{% url 'song_create' %}">Add</a></li>
+{% for song in songs %}
+<li>{{ song }} <a href="{% url 'song_update' pk=song.pk %}">Edit</a></li>
+{% endfor %}
+</ul>
+
+<h2>Booklets</h2>
+<ul>
+<li><a href="{% url 'booklet_create' %}">Add</a></li>
+{% for booklet in booklets %}
+<li>{{ booklet }} <a href="{% url 'booklet_update' pk=booklet.pk %}">Edit</a>
+    <a href="{% url 'booklet_render' pk=booklet.pk %}">Render</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
