@@ -20,7 +20,7 @@ class PageField(forms.CharField):
             if isinstance(coordinate, str):
                 s = coordinate
             else:
-                s = self.position_to_str(coordinate)
+                s = PageField.position_to_str(coordinate)
             return '%s%s' % (page, s)
         else:
             return value
