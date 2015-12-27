@@ -42,9 +42,10 @@ class Booklet(models.Model):
 class BookletEntry(models.Model):
     booklet = models.ForeignKey(Booklet)
     song = models.ForeignKey(Song)
-    order = models.IntegerField()
+    page = models.IntegerField()
+    position = models.CharField(blank=True, max_length=50)
 
     twocolumn = models.BooleanField()
 
     class Meta:
-        ordering = ['booklet', 'order']
+        ordering = ['booklet', 'page', 'position']

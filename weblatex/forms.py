@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry
 from weblatex.engine import pdflatex, TexException
+from weblatex.fields import PageField
 
 
 class BookletForm(forms.ModelForm):
@@ -28,37 +29,40 @@ class BookletForm(forms.ModelForm):
         s = []
         for song in self._songs:
             s.append({
-                'order': self['order_%d' % song.pk],
+                'page': self['page_%d' % song.pk],
                 'song': song,
                 'twocolumn': self['twocolumn_%d' % song.pk],
             })
         return s
 
     def add_entry(self, i, entry):
-        self.fields['order_%d' % entry.song.pk] = forms.IntegerField(
-            initial=i + 1, required=False)
-        self.fields['twocolumn_%d' % entry.song.pk] = forms.BooleanField(
-            initial=entry.twocolumn, required=False)
-        self._songs.append(entry.song)
+        self.add_song_fields(entry.song, page=(entry.page, entry.position),
+                             twocolumn=entry.twocolumn)
 
     def add_song(self, song):
-        self.fields['order_%d' % song.pk] = forms.IntegerField(
-            initial=None, required=False)
+        add_song_fields(song, page=None, twocolumn=False)
+
+    def add_song_fields(self, song, page, twocolumn):
+        self.fields['page_%d' % song.pk] = PageField(
+            initial=page, required=False)
         self.fields['twocolumn_%d' % song.pk] = forms.BooleanField(
-            initial=False, required=False)
+            initial=twocolumn, required=False)
         self._songs.append(song)
 
     def _save_m2m(self):
         super(BookletForm, self)._save_m2m()
         entries = []
         for s in Song.objects.all():
-            order = self.cleaned_data.get('order_%d' % s.pk)
+            pp = self.cleaned_data.get('page_%d' % s.pk)
             twocolumn = self.cleaned_data.get('twocolumn_%d' % s.pk)
-            if order is not None:
+            if pp is not None:
+                page, position = pp
+                position_str = PageField.position_to_str(position)
                 entries.append(
                     BookletEntry(booklet=self.instance,
                                  song=s,
-                                 order=order,
+                                 page=page,
+                                 position=position_str,
                                  twocolumn=twocolumn))
         self.instance.bookletentry_set.all().delete()
         BookletEntry.objects.bulk_create(entries)
