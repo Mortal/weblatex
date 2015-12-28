@@ -16,7 +16,7 @@ def lyrics_as_tex(lyrics):
     result.append(r'\begin{enumerate}')
     for p in paragraphs:
         lines = p.splitlines()
-        result.append(r'\item %s' % '\\\\\n'.join(lines))
+        result.append('\\item\n%s' % '\n\\\\\n'.join(lines))
     result.append(r'\end{enumerate}')
     return ''.join('%s\n' % l for l in result)
 
