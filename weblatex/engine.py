@@ -7,6 +7,9 @@ import textwrap
 import subprocess
 
 from django.http import HttpResponse
+from django.template import Context
+from django.template.loader import get_template
+from django.utils.safestring import mark_safe
 
 
 class TexException(Exception):
@@ -20,30 +23,15 @@ class TexException(Exception):
 
 
 def pdflatex(data):
-    source = textwrap.dedent(r"""
-    \documentclass[article,oneside,a4paper]{memoir}
-    \usepackage[sc]{mathpazo}
-    \usepackage[final]{microtype}
-    \usepackage{multicol}
-    \usepackage[utf8]{inputenc}
-    \usepackage{amsmath}
-    \catcode`<=\active
-    \def<#1>{${}^{\text{#1}}$}
-    \def\b{${}^\mathrm{b}$}
-    \begin{document}
-    \tableofcontents*
-    \clearpage
-    %s
-    \end{document}
-    """.strip()) % (data,)
+    context = {'document': mark_safe(data)}
+    template = get_template('weblatex/booklet.tex')
+    source = template.render(context)
     with tempfile.TemporaryDirectory() as directory:
         tex_filename = os.path.join(directory, 'document.tex')
         pdf_filename = os.path.join(directory, 'document.pdf')
         with open(tex_filename, 'w') as fp:
             fp.write(source)
-        pp = subprocess.Popen(
-            ['latexmk', '-pdf', '-latexoption=-interaction nonstopmode',
-             'document.tex'],
+        pp = subprocess.Popen(['latexmk', '-pdf', 'document.tex'],
             cwd=directory, universal_newlines=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         with pp:

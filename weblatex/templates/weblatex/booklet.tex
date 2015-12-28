@@ -1,0 +1,17 @@
+\batchmode
+\documentclass[article,oneside,a4paper]{memoir}
+\usepackage[sc]{mathpazo}
+\usepackage[final]{microtype}
+\usepackage{multicol}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\catcode`<=\active
+\def<#1>{${}^{\text{#1}}$}
+\def\b{${}^\mathrm{b}$}
+\begin{document}
+\tableofcontents*
+\clearpage
+\nonstopmode
+{{ document }}
+\batchmode
+\end{document}
