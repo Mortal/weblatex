@@ -75,7 +75,7 @@ class BookletForm(forms.ModelForm):
 class SongForm(forms.ModelForm):
     class Meta:
         model = Song
-        fields = ('name', 'lyrics')
+        fields = ('name', 'attribution', 'lyrics')
 
     def clean_lyrics(self):
         data = lyrics_as_tex(self.cleaned_data['lyrics'])
