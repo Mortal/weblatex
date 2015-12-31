@@ -3,9 +3,10 @@ from __future__ import division, absolute_import, unicode_literals
 from django import forms
 from django.core.exceptions import ValidationError
 
-from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry
+from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry, UploadedSong
 from weblatex.engine import pdflatex, TexException
 from weblatex.fields import PositionField
+from weblatex.upload import parse
 
 
 class BookletForm(forms.ModelForm):
@@ -86,3 +87,19 @@ class SongForm(forms.ModelForm):
             raise ValidationError(str(e))
 
         return self.cleaned_data['lyrics']
+
+
+class SongUploadForm(forms.Form):
+    file = forms.FileField()
+
+    def clean_file(self):
+        f = self.cleaned_data['file'].read()
+        parse(f)  # Might raise ValidationError
+        return self.cleaned_data['file']
+
+    def save(self):
+        f = self.cleaned_data['file'].read()
+        song = parse(f)
+        song.save()
+        uploaded_song = UploadedSong(song=song, source=f)
+        uploaded_song.save()

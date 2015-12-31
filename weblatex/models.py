@@ -100,3 +100,9 @@ class BookletEntry(models.Model):
 
     class Meta:
         ordering = ['booklet', 'page', 'position']
+
+
+class UploadedSong(models.Model):
+    song = models.ForeignKey(Song)
+    source = models.TextField()
+    upload_time = models.DateTimeField(auto_now_add=True)
