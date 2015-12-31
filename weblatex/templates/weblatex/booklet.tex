@@ -5,9 +5,60 @@
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{tket}
+\usepackage{times}
+\usepackage{enumitem}
+
+\renewcommand{\sfdefault}{pun}
+
+\setulmarginsandblock{2.5cm}{2.5cm}{*}
+\setlrmarginsandblock{1.5cm}{2.0cm}{*}
+\checkandfixthelayout
+
+\def\sangtitel#1#2{%
+  \begingroup%
+    \raggedright\interlinepenalty=10000
+    \parfillskip=0pt plus 1fill
+    \LARGE\bfseries\sffamily
+    {\thechapter.\hspace{.5em}}#1
+    \nobreak\quad\nobreak
+    \hfill
+    \penalty550\hskip0pt plus -2fill
+    \nobreak\hskip1em\hbox{}\nobreak\hfill
+    \nobreak\hskip-1em
+    \hbox{\normalfont\Large\itshape #2}\par%
+  \endgroup%
+}
+
+\newenvironment{sang}[2]{%
+  \par\vspace{1.4em}%
+  \addtocounter{chapter}{1}%
+  \addcontentsline{toc}{chapter}{\numberline{\thechapter}#1}
+  \sangtitel{#1}{#2}%
+  \vspace{1.4em}%
+}{%
+}
+
+\newenvironment{vers}{%
+  \par\addpenalty{-1000}%
+  \item
+\begin{minipage}[t]{\textwidth}}{\end{minipage}}
+\newenvironment{omkvaed}{%
+  \par\addpenalty{-1000}%
+\item[]
+  \begin{minipage}[t]{\textwidth}
+    \hspace{-1.5em}\itshape Omkvæd:\\\relax
+}{\end{minipage}}
+
 \catcode`<=\active
 \def<#1>{${}^{\text{#1}}$}
 \def\b{${}^\mathrm{b}$}
+
+\def\repon{\ensuremath{\|{\colon}}~\ignorespaces}
+\def\repoff{\unskip~\ensuremath{ {\colon}\|}}
+
+\setlength{\multicolsep}{0pt}
+
 \begin{document}
 \tableofcontents*
 \clearpage

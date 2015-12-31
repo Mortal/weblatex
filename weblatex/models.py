@@ -13,10 +13,17 @@ def lyrics_as_tex(lyrics):
     lyrics = re.sub(r'^ +| +$', '', lyrics, 0, re.M)
     result = []
     paragraphs = re.split(r'\n\n+', lyrics)
-    result.append(r'\begin{enumerate}')
+    result.append(r'\begin{enumerate}[leftmargin=1.5em,align=left,labelwidth=1.2em,labelsep=0.3em]')
     for p in paragraphs:
+        if p.startswith('[Omk]'):
+            p = p[5:].strip()
+            kind = 'omkvaed'
+        else:
+            kind = 'vers'
         lines = p.splitlines()
-        result.append('\\item\n%s' % '\n\\\\\n'.join(lines))
+        result.append(
+            '\\begin{%s}%%\n%s\end{%s}%%\n' %
+            (kind, '\n\\\\\\relax\n'.join(lines), kind))
     result.append(r'\end{enumerate}')
     return ''.join('%s\n' % l for l in result)
 
@@ -55,6 +62,7 @@ class Booklet(models.Model):
                 for position, entry in page_songs
             ]
             render_stack = [(0, page_songs)]
+            # output.append(r'\begin{multicols}{2}')
             while render_stack:
                 disc, xs = render_stack.pop()
                 if isinstance(disc, str):
@@ -86,6 +94,7 @@ class Booklet(models.Model):
                                 (r'\noindent\begin{minipage}[t]' +
                                  r'{%s\textwidth}%%' % (1/len(children)),
                                  None))
+            # output.append(r'\end{multicols}')
             output.append(r'\clearpage')
         return '\n'.join(output)
 
