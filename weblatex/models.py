@@ -106,3 +106,6 @@ class UploadedSong(models.Model):
     song = models.ForeignKey(Song)
     source = models.BinaryField()
     upload_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.song)
