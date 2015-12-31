@@ -37,24 +37,27 @@
   \specialindex{songs}{chapter}{#1}
   \sangtitel{#1}{#2}%
   \vspace{1.4em}%
-  \begin{enumerate}[leftmargin=1.5em,align=left,labelwidth=1.2em,labelsep=0.3em,parsep=0pt]
+  \begin{enumerate}[
+    leftmargin=1.5em,
+    align=left,
+    labelwidth=1.2em,
+    labelsep=0.3em,
+    parsep=0pt]
 }{%
 \end{enumerate}}
 
 \newenvironment{vers}{%
   \par%
-  \pagebreak[3]%
   \item
 }{}
 \newenvironment{omkvaed}{%
   \par%
-  \pagebreak[3]%
 \item[]
     \hspace{-1.5em}\itshape Omkvæd:\\\relax
 }{}
 
 \newcommand{\verseend}{%
-  \par%
+  \par\penalty9999%
 }
 
 \catcode`<=\active
@@ -62,7 +65,8 @@
 \def\b{${}^\mathrm{b}$}
 
 \def\repon{\ensuremath{\|{\colon}}~\ignorespaces}
-\def\repoff{\unskip~\ensuremath{ {\colon}\|}}
+\def\repoff{\unskip~\ensuremath{%
+{\colon}\|}}
 
 \setlength{\multicolsep}{0pt}
 
@@ -71,7 +75,7 @@
     {\let\item\@idxitem
      {\Large\bfseries\sffamily\noindent Indholdsfortegnelse\par}%
      \begingroup\setlength\multicolsep{1.25\baselineskip}%
-     \begin{multicols}{3}%
+     \begin{multicols}{3}\raggedcolumns%
        \raggedright
     }{\end{multicols}\endgroup}%
 \def\indexspace{\par\penalty-300\vspace{\baselineskip}}
@@ -80,10 +84,13 @@
 
 \makeindex[songs]
 
+\def\multicolinit{\raggedcolumns\setcounter{finalcolumnbadness}{0}}
+
 \begin{document}
 \printindex[songs]
 \clearpage
 \nonstopmode
+\setcounter{collectmore}{3}
 {{ document }}
 \batchmode
 \end{document}

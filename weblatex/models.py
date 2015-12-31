@@ -70,7 +70,7 @@ class Booklet(models.Model):
                     song_tex = lyrics_as_tex(e.song.lyrics)
                     if e.twocolumn:
                         song_tex = (
-                            r'\begin{multicols}{2}' +
+                            r'\begin{multicols}{2}\multicolinit' +
                             r'%s\end{multicols}' % song_tex
                         )
                     output.append(
