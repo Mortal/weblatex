@@ -30,6 +30,15 @@ class BookletRender(DetailView):
         return render_pdf(self.get_object().as_tex())
 
 
+class BookletRenderSource(DetailView):
+    model = Booklet
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse(
+            render_tex(self.get_object().as_tex()),
+            content_type='text/plain; charset=utf8')
+
+
 class BookletSongs(UpdateView):
     form_class = BookletForm
     template_name = 'weblatex/booklet.html'
