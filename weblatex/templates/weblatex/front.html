@@ -14,7 +14,7 @@
 <ul>
 <li><a href="{% url 'booklet_create' %}">Add</a></li>
 {% for booklet in booklets %}
-<li>{{ booklet }} <a href="{% url 'booklet_update' pk=booklet.pk %}">Edit</a>
+<li>{{ booklet }} <a href="{% url 'booklet_songs' pk=booklet.pk %}">Edit songs</a>
     <a href="{% url 'booklet_render' pk=booklet.pk %}">Render</a></li>
 {% endfor %}
 </ul>
