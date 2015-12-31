@@ -23,7 +23,7 @@ def lyrics_as_tex(lyrics):
 
 class Song(models.Model):
     name = models.CharField(max_length=100)
-    attribution = models.CharField(max_length=200)
+    attribution = models.CharField(max_length=200, blank=True)
     lyrics = models.TextField()
 
     def __str__(self):
