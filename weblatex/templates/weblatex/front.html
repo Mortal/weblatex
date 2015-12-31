@@ -5,6 +5,7 @@
 <h2>Songs</h2>
 <ul>
 <li><a href="{% url 'song_create' %}">Add</a></li>
+<li><a href="{% url 'song_upload' %}">Upload</a></li>
 {% for song in songs %}
 <li>{{ song }} <a href="{% url 'song_update' pk=song.pk %}">Edit</a></li>
 {% endfor %}
