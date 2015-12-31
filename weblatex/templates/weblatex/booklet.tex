@@ -11,7 +11,7 @@
 
 \renewcommand{\sfdefault}{pun}
 
-\setulmarginsandblock{2.5cm}{2.5cm}{*}
+\setulmarginsandblock{2.0cm}{2.0cm}{*}
 \setlrmarginsandblock{1.5cm}{2.0cm}{*}
 \checkandfixthelayout
 
@@ -34,21 +34,28 @@
   \par\vspace{1.4em}%
   \addtocounter{chapter}{1}%
   \addcontentsline{toc}{chapter}{\numberline{\thechapter}#1}
+  \specialindex{songs}{chapter}{#1}
   \sangtitel{#1}{#2}%
   \vspace{1.4em}%
+  \begin{enumerate}[leftmargin=1.5em,align=left,labelwidth=1.2em,labelsep=0.3em,parsep=0pt]
 }{%
-}
+\end{enumerate}}
 
 \newenvironment{vers}{%
-  \par\addpenalty{-1000}%
+  \par%
+  \pagebreak[3]%
   \item
-\begin{minipage}[t]{\textwidth}}{\end{minipage}}
+}{}
 \newenvironment{omkvaed}{%
-  \par\addpenalty{-1000}%
+  \par%
+  \pagebreak[3]%
 \item[]
-  \begin{minipage}[t]{\textwidth}
     \hspace{-1.5em}\itshape Omkvæd:\\\relax
-}{\end{minipage}}
+}{}
+
+\newcommand{\verseend}{%
+  \par%
+}
 
 \catcode`<=\active
 \def<#1>{${}^{\text{#1}}$}
@@ -59,8 +66,22 @@
 
 \setlength{\multicolsep}{0pt}
 
+\makeatletter
+\renewenvironment{theindex}
+    {\let\item\@idxitem
+     {\Large\bfseries\sffamily\noindent Indholdsfortegnelse\par}%
+     \begingroup\setlength\multicolsep{1.25\baselineskip}%
+     \begin{multicols}{3}%
+       \raggedright
+    }{\end{multicols}\endgroup}%
+\def\indexspace{\par\penalty-300\vspace{\baselineskip}}
+\renewcommand\@idxitem{\penalty0\par\hangindent1.5em}%
+\makeatother
+
+\makeindex[songs]
+
 \begin{document}
-\tableofcontents*
+\printindex[songs]
 \clearpage
 \nonstopmode
 {{ document }}

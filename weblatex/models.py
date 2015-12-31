@@ -13,7 +13,6 @@ def lyrics_as_tex(lyrics):
     lyrics = re.sub(r'^ +| +$', '', lyrics, 0, re.M)
     result = []
     paragraphs = re.split(r'\n\n+', lyrics)
-    result.append(r'\begin{enumerate}[leftmargin=1.5em,align=left,labelwidth=1.2em,labelsep=0.3em]')
     for p in paragraphs:
         if p.startswith('[Omk]'):
             p = p[5:].strip()
@@ -23,8 +22,7 @@ def lyrics_as_tex(lyrics):
         lines = p.splitlines()
         result.append(
             '\\begin{%s}%%\n%s\end{%s}%%\n' %
-            (kind, '\n\\\\\\relax\n'.join(lines), kind))
-    result.append(r'\end{enumerate}')
+            (kind, '\n\\verseend\n'.join(lines), kind))
     return ''.join('%s\n' % l for l in result)
 
 
