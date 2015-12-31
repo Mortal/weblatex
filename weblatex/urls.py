@@ -25,7 +25,7 @@ from weblatex.views import (
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', Front.as_view(), name='front'),
-    url(r'^booklet/$', BookletCreate.as_view(), name='booklet_create'),
+    url(r'^booklet/add/$', BookletCreate.as_view(), name='booklet_create'),
     url(r'^booklet/(?P<pk>\d+)/songs/$', BookletSongs.as_view(),
         name='booklet_songs'),
     url(r'^booklet/(?P<pk>\d+)/render/$', BookletRender.as_view(),
