@@ -30,21 +30,25 @@ class BookletForm(forms.ModelForm):
         for song in self._songs:
             s.append({
                 'page': self['page_%d' % song.pk],
+                'position': self['position_%d' % song.pk],
                 'song': song,
                 'twocolumn': self['twocolumn_%d' % song.pk],
             })
         return s
 
     def add_entry(self, i, entry):
-        self.add_song_fields(entry.song, page=(entry.page, entry.position),
+        self.add_song_fields(entry.song, page=entry.page,
+                             position=entry.position,
                              twocolumn=entry.twocolumn)
 
     def add_song(self, song):
         self.add_song_fields(song, page=None, twocolumn=False)
 
-    def add_song_fields(self, song, page, twocolumn):
-        self.fields['page_%d' % song.pk] = PageField(
+    def add_song_fields(self, song, page, position, twocolumn):
+        self.fields['page_%d' % song.pk] = forms.IntegerField(
             initial=page, required=False)
+        self.fields['position_%d' % song.pk] = PageField(
+            initial=position, required=False)
         self.fields['twocolumn_%d' % song.pk] = forms.BooleanField(
             initial=twocolumn, required=False)
         self._songs.append(song)
@@ -53,10 +57,10 @@ class BookletForm(forms.ModelForm):
         super(BookletForm, self)._save_m2m()
         entries = []
         for s in Song.objects.all():
-            pp = self.cleaned_data.get('page_%d' % s.pk)
+            page = self.cleaned_data.get('page_%d' % s.pk)
+            position = self.cleaned_data.get('position_%d' % s.pk)
             twocolumn = self.cleaned_data.get('twocolumn_%d' % s.pk)
-            if pp:
-                page, position = pp
+            if page:
                 position_str = PageField.position_to_str(position)
                 entries.append(
                     BookletEntry(booklet=self.instance,

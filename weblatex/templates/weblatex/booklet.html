@@ -1,6 +1,6 @@
 <form method="post">{% csrf_token %}
     {% for song in form.songs %}
-    <p>{{ song.page }} {{ song.song }} {{ song.twocolumn }}</p>
+    <p>{{ song.page }} {{ song.position }} {{ song.song }} {{ song.twocolumn }}</p>
     {% endfor %}
     <input type="submit" value="Save" />
 </form>

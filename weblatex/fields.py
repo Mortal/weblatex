@@ -27,12 +27,7 @@ class PageField(forms.CharField):
     @staticmethod
     def static_prepare_value(value):
         if isinstance(value, tuple):
-            page, coordinate = value
-            if isinstance(coordinate, str):
-                s = coordinate
-            else:
-                s = PageField.position_to_str(coordinate)
-            return '%s%s' % (page, s)
+            return PageField.position_to_str(value)
         else:
             return value
 
@@ -43,14 +38,9 @@ class PageField(forms.CharField):
         value = super(PageField, self).clean(value)
         if not value:
             return value
-        mo = re.match(r'(\d+)(.*)', value)
-        if not mo:
-            raise ValidationError(
-                'Sidetal skal være et heltal')
-        page, position = int(mo.group(1)), mo.group(2)
         pattern = r'(v\d+)?(h\d+)?'
         p2 = r'^(%s)+$' % pattern
-        if not re.match(p2, position):
+        if not re.match(p2, value):
             raise ValidationError(
-                'Sidetal skal være et heltal')
-        return (page, self.parse_position(position))
+                'Ugyldig position')
+        return self.parse_position(value)
