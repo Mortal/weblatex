@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', Front.as_view(), name='front'),
     url(r'^booklet/$', BookletCreate.as_view(), name='booklet_create'),
-    url(r'^booklet/(?P<pk>\d+)/$', BookletUpdate.as_view(),
+    url(r'^booklet/(?P<pk>\d+)/songs/$', BookletUpdate.as_view(),
         name='booklet_update'),
     url(r'^booklet/(?P<pk>\d+)/render/$', BookletRender.as_view(),
         name='booklet_render'),
