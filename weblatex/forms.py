@@ -42,7 +42,7 @@ class BookletForm(forms.ModelForm):
                              twocolumn=entry.twocolumn)
 
     def add_song(self, song):
-        self.add_song_fields(song, page=None, twocolumn=False)
+        self.add_song_fields(song, page=None, position=None, twocolumn=False)
 
     def add_song_fields(self, song, page, position, twocolumn):
         self.fields['page_%d' % song.pk] = forms.IntegerField(
