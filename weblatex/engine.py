@@ -22,10 +22,14 @@ class TexException(Exception):
             return 'Unknown TeX error. %s' % raw
 
 
-def pdflatex(data):
+def render_tex(data):
     context = {'document': mark_safe(data)}
     template = get_template('weblatex/booklet.tex')
     source = template.render(context)
+    return source
+
+
+def pdflatex(source):
     with tempfile.TemporaryDirectory() as directory:
         tex_filename = os.path.join(directory, 'document.tex')
         pdf_filename = os.path.join(directory, 'document.pdf')
@@ -45,7 +49,8 @@ def pdflatex(data):
 
 def render_pdf(data):
     try:
-        pdf_contents = pdflatex(data)
+        source = render_tex(data)
+        pdf_contents = pdflatex(source)
         return HttpResponse(pdf_contents, content_type='application/pdf')
     except TexException as e:
         return HttpResponse(

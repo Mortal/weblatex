@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry, UploadedSong
-from weblatex.engine import pdflatex, TexException
+from weblatex.engine import pdflatex, render_tex, TexException
 from weblatex.fields import PositionField
 from weblatex.upload import parse
 
@@ -82,7 +82,7 @@ class SongForm(forms.ModelForm):
         data = lyrics_as_tex(self.cleaned_data['lyrics'])
 
         try:
-            pdflatex(data)
+            pdflatex(render_tex(data))
         except TexException as e:
             raise ValidationError(str(e))
 
