@@ -19,7 +19,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from weblatex.views import (
     BookletCreate, BookletSongs, BookletRender,
-    SongCreate, SongUpdate,
+    SongCreate, SongUpdate, SongUpload,
     Front,
 )
 
@@ -33,4 +33,5 @@ urlpatterns = [
         name='booklet_render'),
     url(r'^song/(?P<pk>\d+)/$', SongUpdate.as_view(), name='song_update'),
     url(r'^song/add/$', SongCreate.as_view(), name='song_create'),
+    url(r'^song/upload/$', SongUpload.as_view(), name='song_upload'),
 ]
