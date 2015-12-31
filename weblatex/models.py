@@ -104,5 +104,5 @@ class BookletEntry(models.Model):
 
 class UploadedSong(models.Model):
     song = models.ForeignKey(Song)
-    source = models.TextField()
+    source = models.BinaryField()
     upload_time = models.DateTimeField(auto_now_add=True)
