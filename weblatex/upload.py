@@ -21,13 +21,15 @@ def parse(f):
         raise ValidationError("file is empty")
 
     patterns = (
-        ('sang', r'\\begin{sang}{(?P<name>[^}]+)}{(?P<attr>[^}]+)}'),
+        ('sang', r'\\begin{sang}{(?P<name>[^}]+)}{(?P<attr>' +
+                 r'(?:[^{}]|{[^{}]+})*)}'),
         ('spal', r'\\spal(?:{\d+}|\d+)'),
         ('laps', r'\\laps'),
-        ('begin', r'\\begin{(?P<begink>vers|omkvaed)}'),
-        ('end', r'\\end{(?P<endk>vers|omkvaed)}'),
+        ('begin', r'\\begin{(?P<begink>vers|omkvaed|bro)}'),
+        ('end', r'\\end{(?P<endk>vers|omkvaed|bro)}'),
         ('endsang', r'\\end{sang}'),
         ('comment', r'%.*'),
+        ('whitespace', r'(?:\\strut|\\newline)'),
     )
     pattern = (
         '(?:%s)' %
@@ -68,12 +70,16 @@ def parse(f):
                 if line.strip())
             if kind == 'omkvaed':
                 lines = '[Omk] %s' % lines
+            elif kind == 'bro':
+                lines = '[Bro] %s' % lines
             song.append(lines)
             text = ''
         elif k == 'endsang':
             extra.append(text)
             text = ''
         elif k == 'comment':
+            pass
+        elif k == 'whitespace':
             pass
         else:
             raise AssertionError("Unknown lastgroup %s" % k)
