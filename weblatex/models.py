@@ -23,6 +23,7 @@ def lyrics_as_tex(lyrics):
 
 class Song(models.Model):
     name = models.CharField(max_length=100)
+    attribution = models.CharField(max_length=200)
     lyrics = models.TextField()
 
     def __str__(self):
@@ -66,7 +67,9 @@ class Booklet(models.Model):
                             r'\begin{multicols}{2}' +
                             r'%s\end{multicols}' % song_tex
                         )
-                    output.append(r'\chapter{%s}%s' % (e.song.name, song_tex))
+                    output.append(
+                        r'\begin{sang}{%s}{%s}%s\end{sang}' %
+                        (e.song.name, e.song.attribution, song_tex))
                 else:
                     groups = itertools.groupby(xs, key=lambda x: x[0][disc])
                     children = [(disc + 1, list(group)) for _, group in groups]
