@@ -1,10 +1,9 @@
 {% extends "weblatex/base.html" %}
 {% block content %}
+{{ errors }}
 <form method="post" enctype="multipart/form-data">
 {% csrf_token %}
-{{ form.non_field_errors }}
-<p>{{ form.file }}</p>
-{{ form.file.errors }}
+<p><input type="file" multiple name="file" /></p>
 <p><input type="submit" /></p>
 </form>
 {% endblock %}

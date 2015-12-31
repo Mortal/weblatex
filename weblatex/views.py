@@ -3,13 +3,15 @@ from __future__ import division, absolute_import, unicode_literals
 from django.views.generic import (
     TemplateView, View, FormView, CreateView, UpdateView, DetailView)
 
+from django.forms.utils import ErrorList
+
 from django.http import HttpResponse
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
 from weblatex.forms import BookletForm, SongForm, SongUploadForm
-from weblatex.engine import render_pdf
+from weblatex.engine import render_pdf, render_tex
 from weblatex.models import Song, Booklet
 
 
@@ -55,19 +57,27 @@ class SongCreate(CreateView):
         return reverse('front')
 
 
-class SongUpload(FormView):
-    form_class = SongUploadForm
+class SongUpload(TemplateView):
     template_name = 'weblatex/song_upload_form.html'
 
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
+    def get(self, request):
+        return self.render_to_response(self.get_context_data())
 
-    def form_valid(self, form):
-        form.save()
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('front')
+    def post(self, request):
+        forms = []
+        for f in request.FILES.getlist('file'):
+            forms.append(SongUploadForm({}, {'file': f}))
+        if all(f.is_valid() for f in forms):
+            for f in forms:
+                f.save()
+            return redirect(reverse('front'))
+        else:
+            errors = []
+            for f in forms:
+                errors += list(f.errors.get('file', []))
+                errors += list(f.non_field_errors())
+            return self.render_to_response(self.get_context_data(
+                errors=ErrorList(errors)))
 
 
 class SongUpdate(UpdateView):
