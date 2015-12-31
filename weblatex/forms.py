@@ -94,12 +94,10 @@ class SongUploadForm(forms.Form):
 
     def clean_file(self):
         f = self.cleaned_data['file'].read()
-        parse(f)  # Might raise ValidationError
-        return self.cleaned_data['file']
+        return parse(f), f  # Might raise ValidationError
 
     def save(self):
-        f = self.cleaned_data['file'].read()
-        song = parse(f)
+        song, source = self.cleaned_data['file']
         song.save()
-        uploaded_song = UploadedSong(song=song, source=f)
+        uploaded_song = UploadedSong(song=song, source=source)
         uploaded_song.save()
