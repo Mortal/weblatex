@@ -26,7 +26,7 @@ class BookletCreate(CreateView):
 class BookletRender(DetailView):
     model = Booklet
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         return render_pdf(self.get_object().as_tex())
 
 
