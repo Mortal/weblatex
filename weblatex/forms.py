@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry
 from weblatex.engine import pdflatex, TexException
-from weblatex.fields import PageField
+from weblatex.fields import PositionField
 
 
 class BookletForm(forms.ModelForm):
@@ -47,7 +47,7 @@ class BookletForm(forms.ModelForm):
     def add_song_fields(self, song, page, position, twocolumn):
         self.fields['page_%d' % song.pk] = forms.IntegerField(
             initial=page, required=False)
-        self.fields['position_%d' % song.pk] = PageField(
+        self.fields['position_%d' % song.pk] = PositionField(
             initial=position, required=False)
         self.fields['twocolumn_%d' % song.pk] = forms.BooleanField(
             initial=twocolumn, required=False)
@@ -61,7 +61,7 @@ class BookletForm(forms.ModelForm):
             position = self.cleaned_data.get('position_%d' % s.pk)
             twocolumn = self.cleaned_data.get('twocolumn_%d' % s.pk)
             if page:
-                position_str = PageField.position_to_str(position)
+                position_str = PositionField.position_to_str(position)
                 entries.append(
                     BookletEntry(booklet=self.instance,
                                  song=s,

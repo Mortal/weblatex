@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 
-class PageField(forms.CharField):
+class PositionField(forms.CharField):
     @staticmethod
     def position_to_str(coordinate):
         return ''.join(('v%s' % x1 if x1 else '') +
@@ -27,7 +27,7 @@ class PageField(forms.CharField):
     @staticmethod
     def static_prepare_value(value):
         if isinstance(value, tuple):
-            return PageField.position_to_str(value)
+            return PositionField.position_to_str(value)
         else:
             return value
 
@@ -35,7 +35,7 @@ class PageField(forms.CharField):
         return self.static_prepare_value(value)
 
     def clean(self, value):
-        value = super(PageField, self).clean(value)
+        value = super(PositionField, self).clean(value)
         if not value:
             return value
         pattern = r'(v\d+)?(h\d+)?'

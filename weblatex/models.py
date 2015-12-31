@@ -5,7 +5,7 @@ import itertools
 
 from django.db import models
 
-from weblatex.fields import PageField
+from weblatex.fields import PositionField
 
 
 def lyrics_as_tex(lyrics):
@@ -35,7 +35,7 @@ class Booklet(models.Model):
     def as_tex(self):
         songs = []
         for e in self.bookletentry_set.all():
-            position = PageField.parse_position(e.position)
+            position = PositionField.parse_position(e.position)
             position = tuple((x1 or 1, x2 or 1) for x1, x2 in position)
             position_flat = tuple(x for xs in position for x in xs)
             songs.append((e.page, position_flat, e))
