@@ -3,9 +3,12 @@ from __future__ import division, absolute_import, unicode_literals
 from django.views.generic import (
     TemplateView, View, FormView, CreateView, UpdateView, DetailView)
 
-from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
-from weblatex.forms import BookletForm, SongForm
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+
+from weblatex.forms import BookletForm, SongForm, SongUploadForm
 from weblatex.engine import render_pdf
 from weblatex.models import Song, Booklet
 
@@ -47,6 +50,21 @@ class Front(TemplateView):
 class SongCreate(CreateView):
     form_class = SongForm
     template_name = 'weblatex/song_form.html'
+
+    def get_success_url(self):
+        return reverse('front')
+
+
+class SongUpload(FormView):
+    form_class = SongUploadForm
+    template_name = 'weblatex/song_upload_form.html'
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('front')
