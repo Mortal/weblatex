@@ -25,7 +25,7 @@ class BookletRender(DetailView):
         return render_pdf(self.get_object().as_tex())
 
 
-class BookletUpdate(UpdateView):
+class BookletSongs(UpdateView):
     form_class = BookletForm
     template_name = 'weblatex/booklet.html'
     queryset = Booklet.objects
