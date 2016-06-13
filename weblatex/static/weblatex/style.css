@@ -1,0 +1,29 @@
+/* vim: set sw=4 et: */
+body {
+    margin: 20px 40px;
+    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    color: #333;
+    font-size: 14px;
+}
+
+h1 {
+    margin: 0 0 20px;
+    color: #666;
+    font-size: 20px;
+    font-weight: 300;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td, th {
+    line-height: 16px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}

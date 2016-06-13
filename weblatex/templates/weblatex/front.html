@@ -6,17 +6,42 @@
 <ul>
 <li><a href="{% url 'song_create' %}">Add</a></li>
 <li><a href="{% url 'song_upload' %}">Upload</a></li>
-{% for song in songs %}
-<li>{{ song }} <a href="{% url 'song_update' pk=song.pk %}">Edit</a></li>
-{% endfor %}
 </ul>
+<table>
+<thead>
+<tr>
+<th>Song name</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+{% for song in songs %}
+<tr>
+<td>{{ song }}</td>
+<td><a href="{% url 'song_update' pk=song.pk %}">Edit</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
 
 <h2>Booklets</h2>
-<ul>
-<li><a href="{% url 'booklet_create' %}">Add</a></li>
+<p><a href="{% url 'booklet_create' %}">Add booklet</a></p>
+<table>
+<thead>
+<tr>
+<th>Booklet title</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
 {% for booklet in booklets %}
-<li>{{ booklet }} <a href="{% url 'booklet_songs' pk=booklet.pk %}">Edit songs</a>
-    <a href="{% url 'booklet_render' pk=booklet.pk %}">Render</a></li>
+<tr>
+<td>{{ booklet }}</td>
+<td><a href="{% url 'booklet_update' pk=booklet.pk %}">Edit</a></td>
+<td><a href="{% url 'booklet_render' pk=booklet.pk %}">Render</a></td>
+</tr>
 {% endfor %}
-</ul>
+</tbody>
+</table>
 {% endblock %}
