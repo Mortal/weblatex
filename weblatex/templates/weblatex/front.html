@@ -38,7 +38,7 @@
 {% for booklet in booklets %}
 <tr>
 <td>{{ booklet }}</td>
-<td><a href="{% url 'booklet_update' pk=booklet.pk %}">Edit</a></td>
+<td><a href="{% url 'booklet_songs' pk=booklet.pk %}">Edit</a></td>
 <td><a href="{% url 'booklet_render' pk=booklet.pk %}">Render</a></td>
 </tr>
 {% endfor %}
