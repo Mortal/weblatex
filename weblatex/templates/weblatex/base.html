@@ -1,8 +1,10 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8" />
 <title>WebLaTeX</title>
+<link rel="stylesheet" type="text/css" href="{% static 'weblatex/style.css' %}" />
 </head>
 <body>
 {% block content %}{% endblock %}
