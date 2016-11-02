@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, unicode_literals
 from django import forms
 from django.core.exceptions import ValidationError
 
-from weblatex.models import Song, lyrics_as_tex, Booklet, BookletEntry, UploadedSong
+from weblatex.models import Song, song_as_tex, Booklet, BookletEntry, UploadedSong
 from weblatex.engine import pdflatex, render_tex, TexException
 from weblatex.fields import PositionField
 from weblatex.upload import parse
@@ -79,7 +79,8 @@ class SongForm(forms.ModelForm):
         fields = ('name', 'attribution', 'lyrics')
 
     def clean_lyrics(self):
-        data = lyrics_as_tex(self.cleaned_data['lyrics'])
+        d = self.cleaned_data
+        data = song_as_tex(d['name'], d['attribution'], d['lyrics'])
 
         try:
             pdflatex(render_tex(data))

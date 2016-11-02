@@ -25,6 +25,15 @@ def lyrics_as_tex(lyrics):
             (kind, '\n\\verseend\n'.join(lines), kind))
     return ''.join('%s\n' % l for l in result)
 
+def song_as_tex(name, attribution, lyrics, twocolumn=False):
+    song_tex = lyrics_as_tex(lyrics)
+    if twocolumn:
+        song_tex = (
+            r'\begin{multicols}{2}\multicolinit' +
+            r'%s\end{multicols}' % song_tex
+        )
+    return (r'\begin{sang}{%s}{%s}%s\end{sang}' %
+        (name, attribution, song_tex))
 
 class Song(models.Model):
     name = models.CharField(max_length=100)
@@ -67,15 +76,9 @@ class Booklet(models.Model):
                     output.append(disc)
                 elif len(xs) == 1:
                     e = xs[0][1]
-                    song_tex = lyrics_as_tex(e.song.lyrics)
-                    if e.twocolumn:
-                        song_tex = (
-                            r'\begin{multicols}{2}\multicolinit' +
-                            r'%s\end{multicols}' % song_tex
-                        )
-                    output.append(
-                        r'\begin{sang}{%s}{%s}%s\end{sang}' %
-                        (e.song.name, e.song.attribution, song_tex))
+                    output.append(song_as_tex(
+                        e.song.name, e.song.attribution,
+                        e.song.lyrics, e.twocolumn))
                 else:
                     groups = itertools.groupby(xs, key=lambda x: x[0][disc])
                     children = [(disc + 1, list(group)) for _, group in groups]
