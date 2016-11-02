@@ -1,4 +1,5 @@
 <form method="post">{% csrf_token %}
+    {{ form.errors }}
     {% for song in form.songs %}
     <p>{{ song.page }} {{ song.position }} {{ song.song }} {{ song.twocolumn }}</p>
     {% endfor %}
