@@ -1,3 +1,5 @@
+{% extends "weblatex/base.html" %}
+{% block content %}
 <script>
 function remove_double_lines(s) {
     return s.replace(/(\r*\n)\r*\n/g, '$1');
@@ -13,3 +15,4 @@ function fix_double_lines() {
 <input type="submit" />
 <input type="button" onclick="fix_double_lines()" value="Fix double lines" />
 </form>
+{% endblock %}

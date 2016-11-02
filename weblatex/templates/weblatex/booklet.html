@@ -1,3 +1,5 @@
+{% extends "weblatex/base.html" %}
+{% block content %}
 <form method="post">{% csrf_token %}
     {{ form.errors }}
     {% for song in form.songs %}
@@ -5,3 +7,4 @@
     {% endfor %}
     <input type="submit" value="Save" />
 </form>
+{% endblock %}
