@@ -1,5 +1,6 @@
 \batchmode
-\documentclass[article,oneside,a4paper]{memoir}
+\documentclass[article,oneside,{{ page_size|default:"a4paper" }},
+{{ font_size|default:"10pt" }}]{memoir}
 \usepackage[sc]{mathpazo}
 \usepackage[final]{microtype}
 \usepackage{multicol}
@@ -60,9 +61,17 @@
   \par\penalty9999%
 }
 
+\newif\ifchords
+\chords{{ chords|yesno:"true,false" }}
+\ifchords
 \catcode`<=\active
 \def<#1>{${}^{\text{#1}}$}
 \def\b{${}^\mathrm{b}$}
+\else
+\catcode`<=\active
+\def<#1>{}
+\def\b{}
+\fi
 
 \def\repon{\ensuremath{\|{\colon}}~\ignorespaces}
 \def\repoff{\unskip~\ensuremath{%

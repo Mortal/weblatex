@@ -19,11 +19,13 @@ def lyrics_as_tex(lyrics):
             kind = 'omkvaed'
         else:
             kind = 'vers'
+        p = p.replace('´', '\'')
         lines = p.splitlines()
         result.append(
             '\\begin{%s}%%\n%s\end{%s}%%\n' %
             (kind, '\n\\verseend\n'.join(lines), kind))
     return ''.join('%s\n' % l for l in result)
+
 
 def song_as_tex(name, attribution, lyrics, twocolumn=False):
     song_tex = lyrics_as_tex(lyrics)
@@ -34,6 +36,7 @@ def song_as_tex(name, attribution, lyrics, twocolumn=False):
         )
     return (r'\begin{sang}{%s}{%s}%s\end{sang}' %
         (name, attribution, song_tex))
+
 
 class Song(models.Model):
     name = models.CharField(max_length=100)
@@ -77,7 +80,8 @@ class Booklet(models.Model):
                 elif len(xs) == 1:
                     e = xs[0][1]
                     output.append(song_as_tex(
-                        e.song.name, e.song.attribution,
+                        e.song.name,
+                        e.song.attribution if e.attribution else '',
                         e.song.lyrics, e.twocolumn))
                 else:
                     groups = itertools.groupby(xs, key=lambda x: x[0][disc])
@@ -107,6 +111,7 @@ class BookletEntry(models.Model):
     position = models.CharField(blank=True, max_length=50)
 
     twocolumn = models.BooleanField()
+    attribution = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['booklet', 'page', 'position']

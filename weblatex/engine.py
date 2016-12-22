@@ -22,8 +22,13 @@ class TexException(Exception):
             return 'Unknown TeX error. %s' % raw
 
 
-def render_tex(data):
-    context = {'document': mark_safe(data)}
+def render_tex(data, page_size=None, chords=False, font_size=None):
+    context = dict(
+        document=mark_safe(data),
+        page_size=page_size,
+        chords=chords,
+        font_size=font_size,
+    )
     template = get_template('weblatex/booklet.tex')
     source = template.render(context)
     return source
@@ -47,9 +52,9 @@ def pdflatex(source):
             return fp.read()
 
 
-def render_pdf(data):
+def render_pdf(*args, **kwargs):
     try:
-        source = render_tex(data)
+        source = render_tex(*args, **kwargs)
         pdf_contents = pdflatex(source)
         return HttpResponse(pdf_contents, content_type='application/pdf')
     except TexException as e:

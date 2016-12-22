@@ -1,5 +1,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
+from collections import Counter
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -34,24 +36,33 @@ class BookletForm(forms.ModelForm):
                 'position': self['position_%d' % song.pk],
                 'song': song,
                 'twocolumn': self['twocolumn_%d' % song.pk],
+                'attribution': self['attribution_%d' % song.pk],
             })
         return s
 
     def add_entry(self, i, entry):
-        self.add_song_fields(entry.song, page=entry.page,
-                             position=entry.position,
-                             twocolumn=entry.twocolumn)
+        self.add_song_fields(
+            entry.song, page=entry.page,
+            position=entry.position,
+            twocolumn=entry.twocolumn,
+            attribution=entry.attribution,
+        )
 
     def add_song(self, song):
-        self.add_song_fields(song, page=None, position=None, twocolumn=False)
+        self.add_song_fields(
+            song, page=None, position=None, twocolumn=False,
+            attribution=True,
+        )
 
-    def add_song_fields(self, song, page, position, twocolumn):
+    def add_song_fields(self, song, page, position, twocolumn, attribution):
         self.fields['page_%d' % song.pk] = forms.IntegerField(
             initial=page, required=False)
         self.fields['position_%d' % song.pk] = PositionField(
             initial=position, required=False)
         self.fields['twocolumn_%d' % song.pk] = forms.BooleanField(
             initial=twocolumn, required=False)
+        self.fields['attribution_%d' % song.pk] = forms.BooleanField(
+            initial=attribution, required=False)
         self._songs.append(song)
 
     def _save_m2m(self):
@@ -61,6 +72,7 @@ class BookletForm(forms.ModelForm):
             page = self.cleaned_data.get('page_%d' % s.pk)
             position = self.cleaned_data.get('position_%d' % s.pk)
             twocolumn = self.cleaned_data.get('twocolumn_%d' % s.pk)
+            attribution = self.cleaned_data.get('attribution_%d' % s.pk)
             if page:
                 position_str = PositionField.position_to_str(position)
                 entries.append(
@@ -68,9 +80,25 @@ class BookletForm(forms.ModelForm):
                                  song=s,
                                  page=page,
                                  position=position_str,
-                                 twocolumn=twocolumn))
+                                 twocolumn=twocolumn,
+                                 attribution=attribution))
         self.instance.bookletentry_set.all().delete()
         BookletEntry.objects.bulk_create(entries)
+
+    def clean(self):
+        x = []
+        for song in self._songs:
+            page = self.cleaned_data['page_%d' % song.pk]
+            position = self.cleaned_data['position_%d' % song.pk]
+            if page:
+                x.append((page, position))
+        c = Counter(x)
+        for song in self._songs:
+            page = self.cleaned_data['page_%d' % song.pk]
+            position = self.cleaned_data['position_%d' % song.pk]
+            if c[page, position] > 1:
+                self.add_error('position_%d' % song.pk,
+                               '%s: Duplicate position' % song.name)
 
 
 class SongForm(forms.ModelForm):

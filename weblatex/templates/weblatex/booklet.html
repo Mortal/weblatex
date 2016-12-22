@@ -3,7 +3,10 @@
 <form method="post">{% csrf_token %}
     {{ form.errors }}
     {% for song in form.songs %}
-    <p>{{ song.page }} {{ song.position }} {{ song.song }} {{ song.twocolumn }}</p>
+    <p>{{ song.page }} {{ song.position }} {{ song.song }}
+        <label>2C: {{ song.twocolumn }}</label>
+        <label>Attr: {{ song.attribution }}</label>
+    </p>
     {% endfor %}
     <input type="submit" value="Save" />
 </form>

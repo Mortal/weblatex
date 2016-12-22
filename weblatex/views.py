@@ -27,7 +27,9 @@ class BookletRender(DetailView):
     model = Booklet
 
     def get(self, request, *args, **kwargs):
-        return render_pdf(self.get_object().as_tex())
+        return render_pdf(self.get_object().as_tex(),
+                          page_size='a5paper',
+                          font_size='10pt')
 
 
 class BookletRenderSource(DetailView):
