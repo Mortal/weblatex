@@ -1,11 +1,13 @@
 from __future__ import division, absolute_import, unicode_literals
 
+import io
 import re
 import itertools
 
 from django.db import models
 
 from weblatex.fields import PositionField
+from weblatex import layout
 
 
 def lyrics_as_tex(lyrics):
@@ -49,59 +51,63 @@ class Song(models.Model):
 
 class Booklet(models.Model):
     songs = models.ManyToManyField(Song, through='BookletEntry')
+    front_text = models.TextField(blank=True)
+    front_image = models.FileField(blank=True)
+    contents = models.BooleanField(default=True)
+
+    def layout_song(self, entries):
+        (pos, entry), = entries
+        return layout.Song(
+            entry.song.name,
+            entry.song.attribution if entry.attribution else '',
+            entry.song.lyrics, entry.twocolumn)
+
+    def layout_rows(self, entries, index):
+        def key(x):
+            return x[0][index][0]
+
+        t = layout.Rows
+
+        def rec(x):
+            return self.layout_cols(x, index)
+
+        if len(entries) == 1:
+            return self.layout_song(entries)
+        if len(set(map(key, entries))) == 1:
+            return rec(entries)
+        return t([rec(list(g))
+                  for _, g in itertools.groupby(entries, key=key)])
+
+    def layout_cols(self, entries, index):
+        def key(x):
+            return x[0][index][1]
+
+        t = layout.Cols
+
+        def rec(x):
+            return self.layout_rows(x, index+1)
+
+        if len(entries) == 1:
+            return self.layout_song(entries)
+        if len(set(map(key, entries))) == 1:
+            return rec(entries)
+        return t([rec(list(g))
+                  for _, g in itertools.groupby(entries, key=key)])
 
     def as_tex(self):
-        songs = []
-        for e in self.bookletentry_set.all():
-            position = PositionField.parse_position(e.position)
-            position = tuple((x1 or 1, x2 or 1) for x1, x2 in position)
-            position_flat = tuple(x for xs in position for x in xs)
-            songs.append((e.page, position_flat, e))
-        songs.sort()
-        pages = itertools.groupby(songs, key=lambda x: x[0])
-        output = []
-        for page, page_songs in pages:
-            page_songs = [
-                (position, entry) for page, position, entry in page_songs
-            ]
-            longest_position = max(
-                len(position) for position, entry in page_songs)
-            page_songs = [
-                (position + (1,) * (longest_position - len(position)),
-                 entry)
-                for position, entry in page_songs
-            ]
-            render_stack = [(0, page_songs)]
-            # output.append(r'\begin{multicols}{2}')
-            while render_stack:
-                disc, xs = render_stack.pop()
-                if isinstance(disc, str):
-                    output.append(disc)
-                elif len(xs) == 1:
-                    e = xs[0][1]
-                    output.append(song_as_tex(
-                        e.song.name,
-                        e.song.attribution if e.attribution else '',
-                        e.song.lyrics, e.twocolumn))
-                else:
-                    groups = itertools.groupby(xs, key=lambda x: x[0][disc])
-                    children = [(disc + 1, list(group)) for _, group in groups]
-                    if disc % 2 == 0:
-                        # Vertical
-                        for c in reversed(children):
-                            render_stack.append(c)
-                    else:
-                        # Horizontal
-                        for c in reversed(children):
-                            render_stack.append((r'\end{minipage}%', None))
-                            render_stack.append(c)
-                            render_stack.append(
-                                (r'\noindent\begin{minipage}[t]' +
-                                 r'{%s\textwidth}%%' % (1/len(children)),
-                                 None))
-            # output.append(r'\end{multicols}')
-            output.append(r'\clearpage')
-        return '\n'.join(output)
+        layout_pages = []
+        all_entries = self.bookletentry_set.all()
+        all_entries = all_entries.order_by('page', 'position', 'song')
+        pages = itertools.groupby(all_entries, key=lambda e: e.page)
+        for page, entries in pages:
+            entries = ((PositionField.parse_position(e.position), e)
+                       for e in entries)
+            layout_pages.append(layout.Page(
+                self.layout_rows(list(entries), 0)))
+        buf = io.StringIO()
+        for p in layout_pages:
+            p.render(buf)
+        return buf.getvalue()
 
 
 class BookletEntry(models.Model):
