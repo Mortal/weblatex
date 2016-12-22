@@ -16,6 +16,7 @@ class Lyrics:
             else:
                 kind = 'vers'
             p = p.replace('´', '\'')
+            p = re.sub(r'(^| )-( |$)',r'\1--\2', p, 0, re.M)
             lines = p.splitlines()
             fp.write(
                 '\\begin{%s}%%\n%s\end{%s}%%\n\n' %

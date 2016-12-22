@@ -1,11 +1,13 @@
 from __future__ import division, absolute_import, unicode_literals
 
+import io
 from collections import Counter
 
 from django import forms
 from django.core.exceptions import ValidationError
 
-from weblatex.models import Song, song_as_tex, Booklet, BookletEntry, UploadedSong
+from weblatex.models import Song, Booklet, BookletEntry, UploadedSong
+from weblatex import layout
 from weblatex.engine import pdflatex, render_tex, TexException
 from weblatex.fields import PositionField
 from weblatex.upload import parse
@@ -108,10 +110,12 @@ class SongForm(forms.ModelForm):
 
     def clean_lyrics(self):
         d = self.cleaned_data
-        data = song_as_tex(d['name'], d['attribution'], d['lyrics'])
+        song = layout.Song(d['name'], d['attribution'], d['lyrics'])
+        buf = io.StringIO()
+        song.render(buf)
 
         try:
-            pdflatex(render_tex(data))
+            pdflatex(render_tex(buf.getvalue()))
         except TexException as e:
             raise ValidationError(str(e))
 

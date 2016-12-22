@@ -11,36 +11,6 @@ from weblatex.fields import PositionField
 from weblatex import layout
 
 
-def lyrics_as_tex(lyrics):
-    lyrics = re.sub(r'\r+\n?', '\n', lyrics)
-    lyrics = re.sub(r'^ +| +$', '', lyrics, 0, re.M)
-    result = []
-    paragraphs = re.split(r'\n\n+', lyrics)
-    for p in paragraphs:
-        if p.startswith('[Omk]'):
-            p = p[5:].strip()
-            kind = 'omkvaed'
-        else:
-            kind = 'vers'
-        p = p.replace('´', '\'')
-        lines = p.splitlines()
-        result.append(
-            '\\begin{%s}%%\n%s\end{%s}%%\n' %
-            (kind, '\n\\verseend\n'.join(lines), kind))
-    return ''.join('%s\n' % l for l in result)
-
-
-def song_as_tex(name, attribution, lyrics, twocolumn=False):
-    song_tex = lyrics_as_tex(lyrics)
-    if twocolumn:
-        song_tex = (
-            r'\begin{multicols}{2}\multicolinit' +
-            r'%s\end{multicols}' % song_tex
-        )
-    return (r'\begin{sang}{%s}{%s}%s\end{sang}' %
-        (name, attribution, song_tex))
-
-
 class Song(models.Model):
     name = models.CharField(max_length=100)
     attribution = models.CharField(max_length=200, blank=True)
