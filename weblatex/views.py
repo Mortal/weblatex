@@ -23,11 +23,21 @@ class BookletCreate(CreateView):
         return reverse('front')
 
 
+class BookletUpdate(UpdateView):
+    model = Booklet
+    fields = ('front_text', 'front_image', 'contents')
+    template_name = 'weblatex/booklet_update.html'
+
+    def get_success_url(self):
+        return reverse('front')
+
+
 class BookletRender(DetailView):
     model = Booklet
 
     def get(self, request, *args, **kwargs):
-        return render_pdf(self.get_object().as_tex(),
+        o = self.get_object()
+        return render_pdf(o.as_tex(), files=o.get_files(),
                           page_size='a5paper',
                           font_size='10pt')
 

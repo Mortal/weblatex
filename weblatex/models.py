@@ -1,6 +1,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
 import io
+import os
 import re
 import itertools
 
@@ -105,9 +106,25 @@ class Booklet(models.Model):
             layout_pages.append(layout.Page(
                 self.layout_rows(list(entries), 0)))
         buf = io.StringIO()
+        if self.front_text:
+            buf.write(self.front_text + '\n')
+        if self.front_image:
+            filename = os.path.basename(self.front_image.name)
+            buf.write('\\noindent\\includegraphics[width=%s\\textwidth]{%s}\n' %
+                      ('0.5' if self.front_text else '1', filename))
+        if self.front_text or self.front_image:
+            buf.write('\\thispagestyle{empty}\\clearpage\n')
+        if self.contents:
+            buf.write('\\tableofcontents\\clearpage\n')
         for p in layout_pages:
             p.render(buf)
         return buf.getvalue()
+
+    def get_files(self):
+        if self.front_image:
+            return ((os.path.basename(self.front_image.name),
+                     self.front_image),)
+        return ()
 
 
 class BookletEntry(models.Model):

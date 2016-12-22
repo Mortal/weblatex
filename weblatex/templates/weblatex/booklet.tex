@@ -12,19 +12,19 @@
 
 \renewcommand{\sfdefault}{pun}
 
-\setulmarginsandblock{2.0cm}{2.0cm}{*}
-\setlrmarginsandblock{1.5cm}{2.0cm}{*}
+\setulmarginsandblock{1.5cm}{*}{1}
+\setlrmarginsandblock{1.5cm}{*}{1}
 \checkandfixthelayout
 
 \def\sangtitel#1#2{%
   \begingroup%
-    \raggedright\interlinepenalty=10000
-    \parfillskip=0pt plus 1fill
-    \LARGE\bfseries\sffamily
-    {\thechapter.\hspace{.5em}}#1
-    \nobreak\quad\nobreak
+    \raggedright\interlinepenalty=10000%
+    \parfillskip=0pt plus 1fill%
+    \LARGE\bfseries\sffamily%
+    {\thechapter.\hspace{.5em}}#1%
+    \nobreak\quad\nobreak%
     \hfill
-    \penalty550\hskip0pt plus -2fill
+    \penalty0\hskip0pt plus -2fill
     \nobreak\hskip1em\hbox{}\nobreak\hfill
     \nobreak\hskip-1em
     \hbox{\normalfont\Large\itshape #2}\par%
@@ -32,20 +32,22 @@
 }
 
 \newenvironment{sang}[2]{%
-  \par\vspace{1.4em}%
   \addtocounter{chapter}{1}%
-  \addcontentsline{toc}{chapter}{\numberline{\thechapter}#1}
-  \specialindex{songs}{chapter}{#1}
+  % For some reason, \addcontentsline inserts vertical space?
   \sangtitel{#1}{#2}%
+  \addcontentsline{toc}{chapter}{\numberline{\thechapter}#1}%
+  \specialindex{songs}{chapter}{#1}%
+  %\rule{1cm}{1cm}\\%
   \vspace{1.4em}%
   \begin{enumerate}[
     leftmargin=1.5em,
     align=left,
     labelwidth=1.2em,
     labelsep=0.3em,
-    parsep=0pt]
-}{%
-\end{enumerate}}
+    parsep=0pt]\raggedright%
+}{\end{enumerate}%
+\par\vspace{1.4em}%
+}
 
 \newenvironment{vers}{%
   \par%
@@ -84,7 +86,7 @@
     {\let\item\@idxitem
      {\Large\bfseries\sffamily\noindent Indholdsfortegnelse\par}%
      \begingroup\setlength\multicolsep{1.25\baselineskip}%
-     \begin{multicols}{3}\raggedcolumns%
+     \begin{multicols}{2}\raggedcolumns%
        \raggedright
     }{\end{multicols}\endgroup}%
 \def\indexspace{\par\penalty-300\vspace{\baselineskip}}
@@ -95,11 +97,11 @@
 
 \def\multicolinit{\raggedcolumns\setcounter{finalcolumnbadness}{0}}
 
-\begin{document}
-\printindex[songs]
-\clearpage
-\nonstopmode
-\setcounter{collectmore}{3}
+\renewcommand{\tableofcontents}{\printindex[songs]}
+
+\begin{document}%
+\nonstopmode%
+\setcounter{collectmore}{3}%
 {{ document }}
-\batchmode
+\batchmode%
 \end{document}

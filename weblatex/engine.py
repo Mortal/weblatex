@@ -34,12 +34,16 @@ def render_tex(data, page_size=None, chords=False, font_size=None):
     return source
 
 
-def pdflatex(source):
+def pdflatex(source, files):
     with tempfile.TemporaryDirectory() as directory:
         tex_filename = os.path.join(directory, 'document.tex')
         pdf_filename = os.path.join(directory, 'document.pdf')
         with open(tex_filename, 'w') as fp:
             fp.write(source)
+        for filename, f in files:
+            with open(os.path.join(directory, filename), 'wb') as fp:
+                f.open('rb')
+                fp.write(f.read())
         pp = subprocess.Popen(['latexmk', '-pdf', 'document.tex'],
             cwd=directory, universal_newlines=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -53,9 +57,10 @@ def pdflatex(source):
 
 
 def render_pdf(*args, **kwargs):
+    files = kwargs.pop('files', ())
     try:
         source = render_tex(*args, **kwargs)
-        pdf_contents = pdflatex(source)
+        pdf_contents = pdflatex(source, files)
         return HttpResponse(pdf_contents, content_type='application/pdf')
     except TexException as e:
         return HttpResponse(
