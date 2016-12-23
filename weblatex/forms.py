@@ -110,12 +110,12 @@ class SongForm(forms.ModelForm):
 
     def clean_lyrics(self):
         d = self.cleaned_data
-        song = layout.Song(d['name'], d['attribution'], d['lyrics'])
-        buf = io.StringIO()
-        song.render(buf)
+        filename = 'lyrics.tex'
+        song = layout.Song(d['name'], d['attribution'], filename).read()
+        files = [(filename, layout.Lyrics(d['lyrics']).read())]
 
         try:
-            pdflatex(render_tex(buf.getvalue()))
+            pdflatex(render_tex(song), files=files)
         except TexException as e:
             raise ValidationError(str(e))
 

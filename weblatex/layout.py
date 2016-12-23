@@ -37,13 +37,18 @@ class Song:
         self.twocolumn = twocolumn
 
     def render(self, fp):
-        fp.write('\\begin{sang}{%s}{%s}\n' % (self.name, self.attribution))
+        fp.write('\\begin{sang}{%s}{%s}%%\n' % (self.name, self.attribution))
         if self.twocolumn:
             fp.write('\\begin{multicols}{2}\\multicolinit\n')
-        fp.write('\\input{%s}\n' % self.filename)
+        fp.write('\\input{%s}%%\n' % self.filename)
         if self.twocolumn:
-            fp.write('\\end{multicols}\n')
-        fp.write('\\end{sang}\n')
+            fp.write('\\end{multicols}%\n')
+        fp.write('\\end{sang}%\n')
+
+    def read(self):
+        buf = io.StringIO()
+        self.render(buf)
+        return buf.getvalue()
 
 
 class Rows:
@@ -62,9 +67,10 @@ class Cols:
     def render(self, fp):
         for c in self.children:
             fp.write('\\noindent\\begin{minipage}[t]' +
-                     '{%s\\textwidth}%%\n' % (1/len(self.children)))
+                     '{%s\\linewidth}%%\n' % (1/len(self.children)))
             c.render(fp)
-            fp.write('\\end{minipage}\n')
+            fp.write('\\end{minipage}%\n')
+        fp.write('\\\\%\n')
 
 
 class Page:
