@@ -1,3 +1,4 @@
+import io
 import re
 
 
@@ -22,19 +23,24 @@ class Lyrics:
                 '\\begin{%s}%%\n%s\end{%s}%%\n\n' %
                 (kind, '\n\\verseend\n'.join(lines), kind))
 
+    def read(self):
+        buf = io.StringIO()
+        self.render(buf)
+        return buf.getvalue()
+
 
 class Song:
-    def __init__(self, name, attribution, lyrics, twocolumn=False):
+    def __init__(self, name, attribution, filename, twocolumn=False):
         self.name = name
         self.attribution = attribution
-        self.lyrics = Lyrics(lyrics)
+        self.filename = filename
         self.twocolumn = twocolumn
 
     def render(self, fp):
         fp.write('\\begin{sang}{%s}{%s}\n' % (self.name, self.attribution))
         if self.twocolumn:
             fp.write('\\begin{multicols}{2}\\multicolinit\n')
-        self.lyrics.render(fp)
+        fp.write('\\input{%s}\n' % self.filename)
         if self.twocolumn:
             fp.write('\\end{multicols}\n')
         fp.write('\\end{sang}\n')

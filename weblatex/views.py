@@ -1,5 +1,8 @@
 from __future__ import division, absolute_import, unicode_literals
 
+import io
+import zipfile
+
 from django.views.generic import (
     TemplateView, View, FormView, CreateView, UpdateView, DetailView)
 
@@ -51,6 +54,24 @@ class BookletRenderSource(DetailView):
         return HttpResponse(
             render_tex(self.get_object().as_tex()),
             content_type='text/plain; charset=utf8')
+
+
+class BookletRenderArchive(DetailView):
+    model = Booklet
+
+    def get(self, request, *args, **kwargs):
+        o = self.get_object()
+        tex = render_tex(o.as_tex(), page_size='a5paper', font_size='10pt')
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, 'w') as zf:
+            zf.writestr('booklet/booklet.tex', tex)
+            for filename, contents in o.get_files():
+                zf.writestr('booklet/' + filename, contents)
+        r = HttpResponse(
+            buf.getvalue(),
+            content_type='application/x-zip-compressed')
+        r['Content-Disposition'] = 'attachment; filename=booklet.zip'
+        return r
 
 
 class BookletPrint(DetailView):

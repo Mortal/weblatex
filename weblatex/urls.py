@@ -19,7 +19,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from weblatex.views import (
     BookletCreate, BookletSongs, BookletRender, BookletRenderSource,
-    BookletUpdate, BookletPrint,
+    BookletUpdate, BookletPrint, BookletRenderArchive,
     SongCreate, SongUpdate, SongUpload,
     Front,
 )
@@ -38,6 +38,8 @@ urlpatterns = [
         name='booklet_render_source'),
     url(r'^booklet/(?P<pk>\d+)/print/$', BookletPrint.as_view(),
         name='booklet_print'),
+    url(r'^booklet/(?P<pk>\d+)/download/$', BookletRenderArchive.as_view(),
+        name='booklet_render_archive'),
     url(r'^song/(?P<pk>\d+)/$', SongUpdate.as_view(), name='song_update'),
     url(r'^song/add/$', SongCreate.as_view(), name='song_create'),
     url(r'^song/upload/$', SongUpload.as_view(), name='song_upload'),

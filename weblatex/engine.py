@@ -1,7 +1,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
+import os
 import re
-import os.path
 import tempfile
 import textwrap
 import subprocess
@@ -41,9 +41,16 @@ def pdflatex(source, files):
         with open(tex_filename, 'w') as fp:
             fp.write(source)
         for filename, f in files:
-            with open(os.path.join(directory, filename), 'wb') as fp:
-                f.open('rb')
-                fp.write(f.read())
+            if isinstance(f, str):
+                mode = 'w'
+            elif isinstance(f, bytes):
+                mode = 'wb'
+            else:
+                raise TypeError(type(f))
+            path = os.path.join(directory, filename)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, mode) as fp:
+                fp.write(f)
         pp = subprocess.Popen(['latexmk', '-pdf', 'document.tex'],
             cwd=directory, universal_newlines=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

@@ -6,9 +6,15 @@ import re
 import itertools
 
 from django.db import models
+from django.utils.text import slugify as dslugify
+from unidecode import unidecode
 
 from weblatex.fields import PositionField
 from weblatex import layout
+
+
+def slugify(string):
+    return dslugify(unidecode(string))
 
 
 class Song(models.Model):
@@ -28,10 +34,11 @@ class Booklet(models.Model):
 
     def layout_song(self, entries):
         (pos, entry), = entries
+        filename, song = self._songs[entry.song_id]
         return layout.Song(
-            entry.song.name,
-            entry.song.attribution if entry.attribution else '',
-            entry.song.lyrics, entry.twocolumn)
+            song.name,
+            song.attribution if entry.attribution else '',
+            filename, entry.twocolumn)
 
     def layout_rows(self, entries, index):
         def key(x):
@@ -66,6 +73,7 @@ class Booklet(models.Model):
                   for _, g in itertools.groupby(entries, key=key)])
 
     def as_tex(self):
+        self._songs = self.get_songs()
         layout_pages = []
         all_entries = self.bookletentry_set.all()
         all_entries = all_entries.order_by('page', 'position', 'song')
@@ -90,11 +98,33 @@ class Booklet(models.Model):
             p.render(buf)
         return buf.getvalue()
 
+    def get_songs(self):
+        filenames = {}
+        song_pk = set()
+        for e in self.bookletentry_set.all():
+            if e.song_id in song_pk:
+                continue
+            song_pk.add(e.song_id)
+            basename = 'sange/' + slugify(e.song.name)
+            ext = '.tex'
+            filename = basename + ext
+            i = 0
+            while filename in filenames:
+                i += 1
+                filename = '%s-%s%s' % (basename, i, ext)
+            filenames[filename] = e.song
+        return {song.pk: (filename, song)
+                for filename, song in filenames.items()}
+
     def get_files(self):
+        songs = self.get_songs()
+        files = [(filename, layout.Lyrics(song.lyrics).read())
+                 for song_id, (filename, song) in sorted(songs.items())]
         if self.front_image:
-            return ((os.path.basename(self.front_image.name),
-                     self.front_image),)
-        return ()
+            self.front_image.open('rb')
+            files.append((os.path.basename(self.front_image.name),
+                          self.front_image.read()))
+        return files
 
 
 class BookletEntry(models.Model):
