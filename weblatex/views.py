@@ -42,9 +42,7 @@ class BookletRender(DetailView):
 
     def get(self, request, *args, **kwargs):
         o = self.get_object()
-        return render_pdf(o.as_tex(), files=o.get_files(),
-                          page_size='a5paper',
-                          font_size='10pt')
+        return render_pdf(o.as_tex(), files=o.get_files())
 
 
 class BookletRenderSource(DetailView):
@@ -61,7 +59,7 @@ class BookletRenderArchive(DetailView):
 
     def get(self, request, *args, **kwargs):
         o = self.get_object()
-        tex = render_tex(o.as_tex(), page_size='a5paper', font_size='10pt')
+        tex = render_tex(o.as_tex())
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w') as zf:
             zf.writestr('booklet/booklet.tex', tex)
@@ -81,7 +79,7 @@ class BookletPrint(DetailView):
     def post(self, request, *args, **kwargs):
         o = self.get_object()
         print("Get TeX...")
-        tex = render_tex(o.as_tex(), page_size='a5paper', font_size='10pt')
+        tex = render_tex(o.as_tex())
         print("Run pdflatex...")
         pdf = pdflatex(tex, files=o.get_files())
         print("Run pdfbook...")

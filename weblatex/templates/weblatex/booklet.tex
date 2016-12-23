@@ -1,6 +1,6 @@
 \batchmode
-\documentclass[article,oneside,{{ page_size|default:"a4paper" }},
-{{ font_size|default:"10pt" }}]{memoir}
+\documentclass[article,oneside,{{ page_size|default:"a5paper" }},
+{{ font_size|default:"12pt" }}]{memoir}
 \usepackage[sc]{mathpazo}
 \usepackage[final]{microtype}
 \usepackage{multicol}
@@ -12,22 +12,24 @@
 
 \renewcommand{\sfdefault}{pun}
 
-\setulmarginsandblock{1.5cm}{*}{1}
-\setlrmarginsandblock{1.5cm}{*}{1}
+\setulmarginsandblock{1cm}{1.6cm}{*}
+\setlrmarginsandblock{0.8cm}{*}{1}
+\setlength{\headsep}{0pt}
+\setlength{\footskip}{0pt}
 \checkandfixthelayout
 
 \def\sangtitel#1#2{%
   \begingroup%
     \raggedright\interlinepenalty=10000%
     \parfillskip=0pt plus 1fill%
-    \LARGE\bfseries\sffamily%
+    \large\bfseries\sffamily%
     {\thechapter.\hspace{.5em}}#1%
     \nobreak\quad\nobreak%
     \hfill
     \penalty0\hskip0pt plus -2fill
     \nobreak\hskip1em\hbox{}\nobreak\hfill
     \nobreak\hskip-1em
-    \hbox{\normalfont\Large\itshape #2}\par%
+    \hbox{\normalsize\normalfont\itshape #2}\par%
   \endgroup%
 }
 
@@ -50,9 +52,11 @@
 }
 
 \newenvironment{vers}{%
-  \par%
   \item
-}{}
+}{%
+  \par
+  \vspace{.9ex}
+}
 \newenvironment{omkvaed}{%
   \par%
 \item[]
