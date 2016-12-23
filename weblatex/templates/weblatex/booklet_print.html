@@ -1,0 +1,7 @@
+{% extends "weblatex/base.html" %}
+{% block content %}
+<form method="post">{% csrf_token %}
+    <label>Antal kopier: <input name="copies" value="1" /></label>
+    <input type="submit" value="Udskriv" />
+</form>
+{% endblock %}

@@ -65,3 +65,26 @@ def render_pdf(*args, **kwargs):
     except TexException as e:
         return HttpResponse(
             e.args[0], content_type='text/plain', status=500)
+
+
+def pdfbook(pdf_contents):
+    with tempfile.TemporaryDirectory() as directory:
+        input_filename = os.path.join(directory, 'document.pdf')
+        output_filename = os.path.join(directory, 'booklet.pdf')
+        with open(input_filename, 'wb') as fp:
+            fp.write(pdf_contents)
+        subprocess.check_call(
+            ('pdfbook', 'document.pdf', '-o', 'booklet.pdf'),
+            cwd=directory)
+        with open(output_filename, 'rb') as fp:
+            return fp.read()
+
+
+def print_duplex_brother(pdf_contents, copies=1):
+    with tempfile.NamedTemporaryFile('wb') as fp:
+        fp.write(pdf_contents)
+        subprocess.check_call(
+            ('lp', '-d', 'Brother_HL-L2340D_series',
+             '-o', 'Duplex=DuplexNoTumble',
+             '-n', str(copies),
+             fp.name))

@@ -11,7 +11,9 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
 from weblatex.forms import BookletForm, SongForm, SongUploadForm
-from weblatex.engine import render_pdf, render_tex
+from weblatex.engine import (
+    render_pdf, render_tex, pdfbook, print_duplex_brother, pdflatex,
+)
 from weblatex.models import Song, Booklet
 
 
@@ -49,6 +51,24 @@ class BookletRenderSource(DetailView):
         return HttpResponse(
             render_tex(self.get_object().as_tex()),
             content_type='text/plain; charset=utf8')
+
+
+class BookletPrint(DetailView):
+    model = Booklet
+    template_name = 'weblatex/booklet_print.html'
+
+    def post(self, request, *args, **kwargs):
+        o = self.get_object()
+        print("Get TeX...")
+        tex = render_tex(o.as_tex(), page_size='a5paper', font_size='10pt')
+        print("Run pdflatex...")
+        pdf = pdflatex(tex, files=o.get_files())
+        print("Run pdfbook...")
+        pdfb = pdfbook(pdf)
+        print("Run lp...")
+        print_duplex_brother(pdfb, int(request.POST.get('copies') or '1'))
+        print("Done!")
+        return redirect(reverse('front'))
 
 
 class BookletSongs(UpdateView):
